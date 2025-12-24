@@ -3,8 +3,8 @@ build/
 cmake-build-debug/
 cmake-build-release/
 external/libtorch/
-external/glad/
-external/imgui/
+external/release/libtorch/
+external/debug/libtorch/
 output*
 results
 .idea
@@ -14,10 +14,19 @@ data
 *.py
 .venv/
 *.png
+!src/**/assets/**/*.png
 *.sqlite
 test.py
 *.nsys-rep
 testdata
+vcpkg/
+vcpkg/**
+vcpkg_*/**
+vcpkg_*/
+build*/
+build*/**
 
 *.pt
 !weights/*.pt
+lichtfeld-studio.aps
+.vs

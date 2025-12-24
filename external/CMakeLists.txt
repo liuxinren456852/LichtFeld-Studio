@@ -1,30 +1,27 @@
-add_subdirectory(json)
-add_subdirectory(args)
-add_subdirectory(glfw)
-add_library(glm INTERFACE IMPORTED GLOBAL)
-target_include_directories(glm INTERFACE glm)
+# SPDX-FileCopyrightText: 2025 LichtFeld Studio Authors
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
 
-set(GLAD_DIR ${CMAKE_CURRENT_SOURCE_DIR}/glad)
-add_library(glad STATIC
-        ${GLAD_DIR}/src/glad.c
-)
-target_include_directories(glad PUBLIC
-        ${GLAD_DIR}/include
-)
+# External dependencies (EXCLUDE_FROM_ALL to prevent third-party install rules)
 
-set(IMGUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/imgui)
-add_library(imgui STATIC
-        ${IMGUI_DIR}/imgui.cpp
-        ${IMGUI_DIR}/imgui_draw.cpp
-        ${IMGUI_DIR}/imgui_widgets.cpp
-        ${IMGUI_DIR}/imgui_tables.cpp
-        ${IMGUI_DIR}/imgui_demo.cpp
-        ${IMGUI_DIR}/backends/imgui_impl_glfw.cpp
-        ${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp
-)
-target_include_directories(imgui PUBLIC
-        ${IMGUI_DIR}
-        ${IMGUI_DIR}/backends
-)
-# ImGui needs GLFW headers
-target_link_libraries(imgui PUBLIC glfw)
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/imguizmo/CMakeLists.txt")
+    message(STATUS "Adding ImGuizmo")
+    add_subdirectory(imguizmo EXCLUDE_FROM_ALL)
+else()
+    message(WARNING "ImGuizmo not found - gizmo controls unavailable")
+endif()
+
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/nvImageCodec/CMakeLists.txt")
+    message(STATUS "Adding nvImageCodec")
+    if(DEFINED DETECTED_COMPUTE_CAP)
+        string(REPLACE "." "" _arch "${DETECTED_COMPUTE_CAP}")
+        set(CUDA_TARGET_ARCHS "${_arch}" CACHE STRING "" FORCE)
+    endif()
+    set(BUILD_NVJPEG_EXT ON CACHE BOOL "" FORCE)
+    set(BUILD_NVJPEG2K_EXT ON CACHE BOOL "" FORCE)
+    set(WITH_DYNAMIC_NVJPEG OFF CACHE BOOL "" FORCE)
+    set(WITH_DYNAMIC_NVJPEG2K OFF CACHE BOOL "" FORCE)
+    add_subdirectory(nvImageCodec EXCLUDE_FROM_ALL)
+else()
+    message(WARNING "nvImageCodec not found - GPU image loading unavailable")
+endif()
